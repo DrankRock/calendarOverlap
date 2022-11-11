@@ -33,6 +33,7 @@ matvei@BigDen:$ python calendarOverlap.py -c English Science Math
 ```
 
 ## Usage
+Important notice : config data is by default stored in a `.calConfig`. You can chose your own config file with `-i | --input [your file]` option.
 ### Show the help : 
 ```
 python3 calendarOverlap.py -h
@@ -83,6 +84,20 @@ python3 calendarOverlap.py -s
 ### Check if a set of activities overlap
 ```
 python3 calendarOverlap.py -c Activity1 Activity2 ...
+```
+
+### autoCheck.sh
+simple bash script looping over the lines in a csv (comma separated value) file, and execution --checkoverlap on each line.   
+Here is an example of execution : 
+```console
+matvei@BigDen:$ cat testCsv.csv
+Math, Science, English
+Math, English
+French, Science, English
+matvei@BigDen:$ bash autoCheck.sh testCsv.csv 
+[1] -- Math  Science  English  --> [['Science', 'English']]
+[2] -- Math  English 
+[3] -- French  Science  English  --> [['Science', 'English']]
 ```
 
 ## License
