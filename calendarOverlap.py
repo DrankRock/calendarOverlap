@@ -4,7 +4,7 @@ import os  # get name of file
 """ calendarOverlap.py : Check if activities are overlapping in a calendar and if a bouquet of activities will induce overlapping. """
 
 __author__ = "Matvei Pavlov"
-__licence__ = "MIT License"
+__license__ = "MIT"
 __version__ = "1.0"
 __email__ = "surname.lastname@etu.univ-grenoble-alpes.fr"
 
@@ -20,7 +20,7 @@ def args():
 	"""
 	parser = argparse.ArgumentParser(description='Check if a set of weekly activities would overlap if put together.')
 	parser.add_argument('-n', '--newactivity', help='Add an activity to the list.', required=False, action='store', nargs=4)
-	parser.add_argument('-d', '--delete', help='Remove an activity from the list.', required=False, action='store', nargs=1)
+	parser.add_argument('-r', '--remove', help='Remove an activity from the list.', required=False, action='store', nargs=1)
 	parser.add_argument('-i', '--input', help='Use as input another config file (default is .calConfig)', required=False, action='store', nargs='?', default=".calConfig")
 	parser.add_argument('-s', '--show', help='Show the config data and current overlapping activities', required=False, action='store_true')
 	parser.add_argument('-c', '--checkOverlap', help='Check if the activities given as arguments overlap with each other', required=False, action='store', nargs='+')
@@ -72,6 +72,9 @@ def addActivity(arguments):
 	"""
 	if arguments[0] in confValues:
 		print("Error : Activity already exists. Please delete it using\n   python {} -d {}".format(os.path.basename(__file__),arguments[0]))
+		exit(1)
+	if hourToTime(arguments[2]) > hourToTime(arguments[3]):
+		print("Error : Activity ends before it starts")
 		exit(1)
 	toAdd = "{}|{}|{}|{}\n".format(arguments[0],arguments[1],arguments[2],arguments[3])
 	with open(inputFile, "a") as file :
@@ -148,28 +151,25 @@ def areThereOverlaps(arguments):
 
 	Args:
 		arguments (list): a list of arguments to be checked
-
-	Returns:
-		bool: True if activities overlapse, else, False
 	"""
-	if len(arguments) == 1 :
-		return False
-	else :
+	if len(arguments) != 1 :
 		# well, that's not very effective, huh
-		ret = False
 		overlaps = checkOverlaps()
+		overlapingTuples = []
 		for activity in arguments :
 			for activity2 in arguments :
 				if activity != activity2:
 					tup = overlapsFormat(activity, activity2)
 					if tup in overlaps :
-						print(tup)
-						ret = True
-
-	return ret
+						if tup not in overlapingTuples:
+							overlapingTuples.append(tup)
+		print(overlapingTuples)
 
 args = args()
 inputFile = args.input
+if not os.path.exists(inputFile):
+	f = open(inputFile, "w+")
+	f.close()
 
 if args.newactivity :
 	loadConfig()
@@ -177,8 +177,8 @@ if args.newactivity :
 if args.show :
 	loadConfig()
 	showValues()
-if args.delete :
+if args.remove :
 	removeActivity(args.delete[0])
 if args.checkOverlap :
 	loadConfig()
-	print(areThereOverlaps(args.checkOverlap))
+	areThereOverlaps(args.checkOverlap)
