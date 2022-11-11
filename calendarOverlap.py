@@ -163,7 +163,8 @@ def areThereOverlaps(arguments):
 					if tup in overlaps :
 						if tup not in overlapingTuples:
 							overlapingTuples.append(tup)
-		print(overlapingTuples)
+		if len(overlapingTuples) != 0:
+			print(overlapingTuples)
 
 args = args()
 inputFile = args.input
